@@ -1,0 +1,48 @@
+
+### Python script that reads and displays a few images from the two classes. ###
+
+import os, random
+import matplotlib.pyplot as plt
+pad_0 = ""
+pad_1 = ""
+pad = ""
+
+filenames = [[], []]
+
+num_samples = 6
+
+while len(filenames[0]) != num_samples or len(filenames[1]) != num_samples:
+    if len(filenames[0]) != num_samples:
+        file_0 = random.choice(os.listdir(pad_0)) 
+        if file_0 not in filenames[0]:
+            filenames[0].append(file_0)
+    if len(filenames[1]) != num_samples:
+        file_1 = random.choice(os.listdir(pad_1))
+        if file_1 not in filenames[1]:
+            filenames[1].append(file_1)
+  
+print(filenames)  
+
+
+fig = plt.figure(figsize=(15,5))
+
+for i in range(num_samples):
+    img_0 = plt.imread(pad_0+"\\"+filenames[0][i])
+    ax = fig.add_subplot(2, num_samples, i+1, frameon=False)
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
+    ax.set_title('0')
+    plt.imshow(img_0)
+    
+    img_1 = plt.imread(pad_1+"\\"+filenames[1][i])
+    ax = fig.add_subplot(2, num_samples, i+num_samples+1, frameon=False)
+    ax.axes.get_xaxis().set_visible(False)
+    ax.axes.get_yaxis().set_visible(False)
+    ax.set_title('1')
+    plt.imshow(img_1)    
+    
+    
+file_im_out = ""
+plt.savefig(file_im_out)
+
+plt.show()
