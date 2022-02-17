@@ -61,13 +61,18 @@ y_val = to_categorical(y_val, 10)
 y_test = to_categorical(y_test, 10)
 
 file_out = r"C:\Users\larsd\OneDrive - TU Eindhoven\Universiteit\Jaar 3\Kwartiel 3\8P361 - Project Imaging\8p361-project-imaging-master\assignments\Experiments assignment 2.1.txt"
-experiments = open(file_out, "w")
+#experiments = open(file_out, "w")
 
 
 # fully connected layers with 64 neurons and ReLU nonlinearity
+import seaborn as sns
 num_layers = [1, 2, 4, 8, 16]
-num_neurons = [64, 128, 256, 512]
+num_neurons = [32, 64, 128, 256]
+experiments_acc = []
+experiments_loss = []
 for i in num_layers:
+    layer_acc = []
+    layer_loss = []
     for j in num_neurons:
         model = Sequential()
         # flatten the 28x28x1 pixel input images to a row of pixels (a 1D-array)
@@ -82,19 +87,34 @@ for i in num_layers:
         model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
         # use this variable to name your model
-        model_name="my_first_model"
+        model_name= str("ReLU_activation_"+str(j)+"neurons_"+str(i)+"hidden_layers")
 
         # create a way to monitor our model in Tensorboard
         tensorboard = TensorBoard("logs/" + model_name)
 
         # train the model
-        model.fit(X_train, y_train, batch_size=32, epochs=10, verbose=1, validation_data=(X_val, y_val), callbacks=[tensorboard])
+        model.fit(X_train, y_train, batch_size=32, epochs=5, verbose=1, validation_data=(X_val, y_val), callbacks=[tensorboard])
 
         score = model.evaluate(X_test, y_test, verbose=0)
 
         print("Loss: ",score[0])
         print("Accuracy: ",score[1])
-        
-        experiment = "# layers: {}    # neurons: {}    Loss: {:.3f}, Accuracy: {:.3f}\n"
-        experiments.write(experiment.format(i, j, score[0], score[1]))
-experiments.close()
+        layer_loss.append(score[0])
+        layer_acc.append(score[1])
+        #experiment = "# layers: {}    # neurons: {}    Loss: {:.3f}, Accuracy: {:.3f}\n"
+        #experiments.write(experiment.format(i, j, score[0], score[1]))
+    experiments_acc.append(layer_acc)
+    experiments_loss.append(layer_loss)
+#experiments.close()                 
+
+fig = plt.figure()
+ax = sns.heatmap(experiments_acc, annot=True, cmap="RdYlGn", fmt='.3g', 
+                 xticklabels=num_neurons, yticklabels=num_layers)
+ax.set(xlabel='# Neurons', ylabel='# Layers')
+ax.set_title("Accuracy")
+fig = plt.figure()
+ax = sns.heatmap(experiments_loss, annot=True, cmap="RdYlGn_r", fmt='.3g', 
+                 xticklabels=num_neurons, yticklabels=num_layers)
+ax.set(xlabel='# Neurons', ylabel='# Layers')
+ax.set_title("Loss")
+print('\a')
