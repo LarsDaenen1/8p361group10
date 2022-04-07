@@ -149,3 +149,4 @@ score = model.evaluate(X_test, y_test, verbose=0)
 
 print("Loss: ",score[0])
 print("Accuracy: ",score[1])
+
